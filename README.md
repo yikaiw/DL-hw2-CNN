@@ -2,8 +2,8 @@
 TensorFlow implementation of CNN.
 
 ## Environment
-* TensorFlow-gpu 1.3.0
-* Python 2.7.12
+* TensorFlow-gpu 1.3
+* Python 3.5
 
 ## Data preparing
 First, download two datasets:
@@ -12,25 +12,31 @@ First, download two datasets:
 * [Dataset download link](https://pan.baidu.com/s/10cT-PIYP2QExZGYEfS6ovw).
 * Directory structure: './dset{1, 2}/train/label{0, 1, ..., 64}/xxx.jpg'.
 
-Second, modify the direction of dataset in main.py.
+Second, build new folder 'data' and put the folders 'dset1' and 'dset2' into 'data'.
 
-Third, write the dataset to tfrecords:
+Third, write dset1 and dset2 to tfrecords:
 
 ```
-python build_data.py
+python tfrecord_writer.py
 ```
 
 ## Training
-Quick train:
+Quick train (default for dset1):
 
 ```
 python main.py
 ```
 
+Or train with selected dataset (dset1 or dset2):
+
+```
+python main.py --dataset dset2
+```
+
 Or continue training from a pre-trained model:
 
 ```
-python main.py --pre_trained 20180117-1030
+python main.py --dataset dset2 --pre_trained 20180117-1030
 ```
 
 ## Results

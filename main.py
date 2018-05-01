@@ -49,8 +49,7 @@ def main():
                 train_writer.flush()
 
                 if step % 100 == 0:
-                    print('Step %d:' % step)
-                    print('  loss   : {}'.format(G_loss_val))
+                    print('Loss of step {}: {}'.format(step, loss))
                 if step % 10000 == 0:
                     save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
                 step += 1

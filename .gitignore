@@ -5,10 +5,15 @@
 *.ap_
 *.dex
 *.class
+
+##----------dir----------
 bin/
 gen/
 build/
 data/
+checkpoints/
+tfrecord/
+__pycache__/
 
 # gradle
 .gradle/

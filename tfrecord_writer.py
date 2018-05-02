@@ -78,6 +78,7 @@ def convert_tfrecord_dataset(img_paths, labels, tfrecord_dir, tfrecord_num, shuf
 
 if __name__ == '__main__':
     for i in range(len(dset_dirs)):
+        print('\nWriting dset{} to tfrecord files:'.format(i + 1))
         img_paths, labels = get_file_path(data_path=dset_dirs[i])
         convert_tfrecord_dataset(img_paths, labels, tfrecord_dirs[i], tfrecord_num, shuffle=True)
     print('\nFinished writing data to tfrecord files.')

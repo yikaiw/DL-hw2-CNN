@@ -9,13 +9,14 @@ np.random.seed(1)
 
 class CNN(object):
     def __init__(self):
-        self.X_inputs = tf.placeholder(tf.float32, [None, config.imgsize, config.imgsize, 3])
+        self.X_inputs = tf.placeholder(tf.float32, [None, config.img_size, config.img_size, 3])
         self.y_inputs = tf.placeholder(tf.int32, [None, ])
         self.labels = tf.one_hot(self.y_inputs, config.class_num, axis=1)
         self.training = tf.placeholder(tf.bool)
 
         self.logits = self.layers(self.X_inputs, self.training)
-        self.loss, self.optimizer, self.accuracy = self.optimize(self.logits, self.labels)
+        self.loss, self.optimizer = self.optimize(self.logits, self.labels)
+        self.accuracy = self.get_accuracy(self.logits, self.labels)
 
     def layers(self, X_inputs, training):
         conv1_1 = tf.layers.conv2d(X_inputs, 32, 5, padding='same', activation=tf.nn.relu)
@@ -47,6 +48,9 @@ class CNN(object):
     def optimize(self, logits, labels):
         loss = tf.losses.softmax_cross_entropy(onehot_labels=labels, logits=logits)
         optimizer = tf.train.AdamOptimizer(config.learning_rate, config.beta1).minimize(loss)
+        return loss, optimizer
+
+    def get_accuracy(self, logits, labels):
         accuracy = tf.metrics.accuracy(
             labels=tf.argmax(labels, axis=1), predictions=tf.argmax(logits, axis=1))[1]
-        return loss, optimizer, accuracy
+        return accuracy

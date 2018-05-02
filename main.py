@@ -5,13 +5,13 @@ import os
 from tfrecord_reader import tfrecord_read
 
 FLAGS = tf.flags.FLAGS
-tf.flags.DEFINE_string('dataset', 'dset1', 'choose dset1/dset2')
-tf.flags.DEFINE_string('pretrained', False, 'for continue training')
+tf.flags.DEFINE_string('dataset', 'dset1', 'choose dset1 or dset2')
+tf.flags.DEFINE_string('pretrained', None, 'for continue training')
 
 
 def main():
     checkpoint_dir = 'checkpoints'
-    if FLAGS.pretrained is True:
+    if FLAGS.pretrained is not None:
         checkpoint_path = os.path.join(checkpoint_dir, FLAGS.pretrained.lstrip('checkpoints/'))
     else:
         current_time = datetime.now().strftime('%Y%m%d-%H%M')
@@ -47,15 +47,23 @@ def main():
         
         try:
             while not coord.should_stop():
-                X_batch, y_batch = sess.run(tfrecord_read(dataset_name=FLAGS.dataset))
-                loss, _, accuracy = sess.run([cnn.loss, cnn.optimizer, cnn.accuracy],
-                                             {cnn.X_inputs: X_batch, cnn.y_inputs: y_batch})
+                X_train_batch, y_train_batch = sess.run(
+                    tfrecord_read(dataset_name=FLAGS.dataset, training=True))
+                loss, _ = sess.run([cnn.loss, cnn.optimizer],
+                    {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
+
+                X_val_batch, y_val_batch = sess.run(
+                    tfrecord_read(dataset_name=FLAGS.dataset, training=False))
+                accuracy = sess.run(cnn.accuracy,
+                    {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
 
                 # train_writer.add_summary(summary, step)
                 # train_writer.flush()
 
                 if step % 100 == 0:
-                    print('Loss of step {}: {}'.format(step, loss))
+                    print('At step {}:'.format(step))
+                    print('\tloss: {}'.format(loss))
+                    print('\taccuracy: {}'.format(accuracy))
                 if step % 10000 == 0:
                     save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
                     print('Model saved in file: %s' % save_path)

@@ -51,6 +51,8 @@ class CNN(object):
         return loss, optimizer
 
     def get_accuracy(self, logits, labels):
-        accuracy = tf.metrics.accuracy(
-            labels=tf.argmax(labels, axis=1), predictions=tf.argmax(logits, axis=1))[1]
+        correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        # accuracy = tf.metrics.accuracy(
+        #     labels=tf.argmax(labels, axis=1), predictions=tf.argmax(logits, axis=1))[1]
         return accuracy

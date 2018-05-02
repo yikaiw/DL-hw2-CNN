@@ -3,6 +3,8 @@ from structure import CNN
 from datetime import datetime
 import os
 from tfrecord_reader import tfrecord_read
+import config
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_string('dataset', 'dset1', 'choose dset1 or dset2')
@@ -21,20 +23,20 @@ def main():
         except os.error:
             print('Unable to make checkpoints direction: %s' % checkpoint_path)
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
+    tfconfig = tf.ConfigProto()
+    tfconfig.gpu_options.allow_growth = True
 
-    graph = tf.Graph()
-    with graph.as_default():
-        cnn = CNN()
-        read_for_train = tfrecord_read(FLAGS.dataset, True, config.train_slice)
-        read_for_val = tfrecord_read(FLAGS.dataset, False, config.train_slice)
+    # graph = tf.Graph()
+    # with graph.as_default():
+    cnn = CNN()
+    read_for_train = tfrecord_read(FLAGS.dataset, True, config.train_slice)
+    read_for_val = tfrecord_read(FLAGS.dataset, False, config.train_slice)
 
-        summary_op = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter(checkpoint_path, graph)
-        saver = tf.train.Saver()
+    # summary_op = tf.summary.merge_all()
+    # train_writer = tf.summary.FileWriter(checkpoint_path, graph)
+    saver = tf.train.Saver()
     
-    with tf.Session(graph=graph, config=config) as sess:
+    with tf.Session(config=tfconfig) as sess:
         if FLAGS.pretrained is not None:
             checkpoint = tf.train.get_checkpoint_state(checkpoint_path)
             meta_graph_path = checkpoint.model_checkpoint_path + '.meta'
@@ -65,7 +67,7 @@ def main():
                     print('At step {}:'.format(step))
                     print('\tloss: {}'.format(loss))
                     print('\taccuracy: {}'.format(accuracy))
-                if step % 10000 == 0:
+                if step % 10000 == 0 and step > 0:
                     save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
                     print('Model saved in file: %s' % save_path)
                 step += 1

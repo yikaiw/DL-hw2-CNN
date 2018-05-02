@@ -52,4 +52,5 @@ def test_reader():
 
 
 if __name__ == '__main__':
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     test_reader()

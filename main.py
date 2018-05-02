@@ -27,6 +27,9 @@ def main():
     graph = tf.Graph()
     with graph.as_default():
         cnn = CNN()
+        read_for_train = tfrecord_read(FLAGS.dataset, True, config.train_slice)
+        read_for_val = tfrecord_read(FLAGS.dataset, False, config.train_slice)
+
         summary_op = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(checkpoint_path, graph)
         saver = tf.train.Saver()
@@ -47,13 +50,11 @@ def main():
         
         try:
             while not coord.should_stop():
-                X_train_batch, y_train_batch = sess.run(
-                    tfrecord_read(dataset_name=FLAGS.dataset, training=True))
+                X_train_batch, y_train_batch = sess.run([read_for_train.X_batch, read_for_train.y_batch])
                 loss, _ = sess.run([cnn.loss, cnn.optimizer],
                     {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
 
-                X_val_batch, y_val_batch = sess.run(
-                    tfrecord_read(dataset_name=FLAGS.dataset, training=False))
+                X_val_batch, y_val_batch = sess.run([read_for_val.X_batch, read_for_val.y_batch])
                 accuracy = sess.run(cnn.accuracy,
                     {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
 

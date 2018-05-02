@@ -8,9 +8,10 @@ import config
 
 dset_dirs = ['data/dset1/train', 'data/dset2/train']
 tfrecord_dirs = ['tfrecord/dset1/', 'tfrecord/dset2/']
-num_shards = config.num_shards  # num of tfrecord files
+tfrecord_num = config.tfrecord_num  # num of tfrecord files
 
-def get_file_path(data_path=dset_dirs):
+
+def get_file_path(data_path):
     # get the path and label for every .jpg file
     img_paths, labels = [], []
     class_dirs = sorted(os.listdir(data_path))
@@ -32,25 +33,20 @@ def get_file_path(data_path=dset_dirs):
     labels = np.asarray(labels)
     return img_paths, labels
 
+
 def bytes_feature(values):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[values]))
+
 
 def int64_feature(values):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[values]))
 
-def convert_tfrecord_dataset(tfrecord_dir, n_shards, img_paths, labels, shuffle=True):
-    """ convert samples to tfrecord dataset.
-    Args:
-        dataset_dir: path of the dataset
-        tfrecord_dir: path of the tfrecord 
-        n_shards: num of tfrecord files
-        img_paths: paths of the images
-        labels: labels of the images
-    """
+
+def convert_tfrecord_dataset(img_paths, labels, tfrecord_dir, tfrecord_num, shuffle=True):
     if not os.path.exists(tfrecord_dir):
         os.makedirs(tfrecord_dir)
     n_sample = len(img_paths)
-    num_per_shard = n_sample // n_shards  # samples number of each tfrecord
+    num_per_shard = n_sample // tfrecord_num  # samples number of each tfrecord
 
     # shuffle manually
     if shuffle:
@@ -59,9 +55,9 @@ def convert_tfrecord_dataset(tfrecord_dir, n_shards, img_paths, labels, shuffle=
         labels = labels[new_idxs]
 
     time0 = time.time()
-    for shard_id in range(n_shards):
+    for shard_id in range(tfrecord_num):
         # output_filename = '%d-of-%d.tfrecord' % (shard_id, n_shards)
-        output_filename = str(shard_id).zfill(len(str(num_shards))) + '.tfrecord'
+        output_filename = str(shard_id).zfill(len(str(tfrecord_num))) + '.tfrecord'
         output_path = os.path.join(tfrecord_dir, output_filename)
 
         with tf.python_io.TFRecordWriter(output_path) as writer:
@@ -79,9 +75,9 @@ def convert_tfrecord_dataset(tfrecord_dir, n_shards, img_paths, labels, shuffle=
                     feature={'image': bytes_feature(img), 'label': int64_feature(label)}))
                 writer.write(example.SerializeToString())
 
+
 if __name__ == '__main__':
     for i in range(len(dset_dirs)):
         img_paths, labels = get_file_path(data_path=dset_dirs[i])
-        convert_tfrecord_dataset(tfrecord_dirs[i], num_shards, img_paths, labels, shuffle=True)
+        convert_tfrecord_dataset(img_paths, labels, tfrecord_dirs[i], tfrecord_num, shuffle=True)
     print('\nFinished writing data to tfrecord files.')
-        

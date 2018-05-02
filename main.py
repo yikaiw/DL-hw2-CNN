@@ -8,6 +8,7 @@ FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_string('dataset', 'dset1', 'choose dset1/dset2')
 tf.flags.DEFINE_string('pretrained', False, 'for continue training')
 
+
 def main():
     checkpoint_dir = 'checkpoints'
     if FLAGS.pretrained is True:
@@ -19,14 +20,18 @@ def main():
             os.makedirs(checkpoint_path)
         except os.error:
             print('Unable to make checkpoints direction: %s' % checkpoint_path)
-    
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+
     graph = tf.Graph()
     with graph.as_default():
+        cnn = CNN()
         summary_op = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(checkpoint_path, graph)
         saver = tf.train.Saver()
     
-    with tf.Session(graph=graph) as sess:
+    with tf.Session(graph=graph, config=config) as sess:
         if FLAGS.pretrained is not None:
             checkpoint = tf.train.get_checkpoint_state(checkpoint_path)
             meta_graph_path = checkpoint.model_checkpoint_path + '.meta'
@@ -43,15 +48,17 @@ def main():
         try:
             while not coord.should_stop():
                 X_batch, y_batch = sess.run(tfrecord_read(dataset_name=FLAGS.dataset))
-                
+                loss, _, accuracy = sess.run([cnn.loss, cnn.optimizer, cnn.accuracy],
+                                             {cnn.X_inputs: X_batch, cnn.y_inputs: y_batch})
 
-                train_writer.add_summary(summary, step)
-                train_writer.flush()
+                # train_writer.add_summary(summary, step)
+                # train_writer.flush()
 
                 if step % 100 == 0:
                     print('Loss of step {}: {}'.format(step, loss))
                 if step % 10000 == 0:
                     save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
+                    print('Model saved in file: %s' % save_path)
                 step += 1
         
         except KeyboardInterrupt:

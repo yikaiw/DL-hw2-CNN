@@ -1,20 +1,28 @@
-# Windows:
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+/gradle/wrapper/gradle-wrapper.properties
+##----------Android----------
+# build
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+build/
+data/
 
-# Python:
-*.py[cod]
-*.so
-*.egg
-*.egg-info
-.DS_Store
-dist
-build
+# gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+build/
 
-# My configurations:
-db.ini
-deploy_key_rsa
+local.properties
 
-/data
-/tfrecord
+##----------idea----------
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# Android Studio Navigation editor temp files
+.navigation/

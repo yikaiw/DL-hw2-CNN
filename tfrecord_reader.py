@@ -4,6 +4,7 @@ import sys
 import config
 import time
 
+
 def tfrecord_read(dataset_name='dset1'):
     tfrecord_dir = os.path.join('tfrecord', dataset_name)
     tfrecord_files = os.listdir(tfrecord_dir)
@@ -17,7 +18,7 @@ def tfrecord_read(dataset_name='dset1'):
         features={'image': tf.FixedLenFeature([], tf.string), 'label': tf.FixedLenFeature([], tf.int64)})
 
     img = features['image']
-    img = tf.image.decode_png(img, channels=3)  # get tf.Tensor([W, H, 3], dtype=int32)
+    img = tf.image.decode_png(img, channels=3)  # get tf.Tensor([height, width, channel], dtype=float32)
     img = tf.image.resize_images(img, size=[config.imgsize, config.imgsize])
     label = features['label']
 

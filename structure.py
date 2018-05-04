@@ -18,29 +18,22 @@ class CNN(object):
         self.loss, self.optimizer = self.optimize(self.logits, self.labels)
         self.accuracy = self.get_accuracy(self.logits, self.labels)
 
+        tf.summary.scalar('loss', self.loss)
+        tf.summary.scalar('accuracy', self.accuracy)
+
     def layers(self, X_inputs, training):
-        conv1_1 = tf.layers.conv2d(X_inputs, 32, 5, padding='same', activation=tf.nn.relu)
-        conv1_2 = tf.layers.conv2d(conv1_1, 32, 3, padding='same', activation=tf.nn.relu)
-        pool1 = tf.layers.max_pooling2d(conv1_2, 2, 2)
-        dropout1 = tf.layers.dropout(pool1, 0.7, training=training)
+        X = X_inputs
+        filters = [64, 128, 256, 512, 512]
+        for filter in filters:
+            for i in range(2):
+                X = tf.layers.conv2d(X, filter, 3, padding='same', activation=None)
+                X = tf.layers.batch_normalization(X, training=training)
+                X = tf.nn.relu(X)
+            X = tf.layers.max_pooling2d(X, 2, 2)
 
-        conv2_1 = tf.layers.conv2d(dropout1, 64, 3, padding='same', activation=tf.nn.relu)
-        conv2_2 = tf.layers.conv2d(conv2_1, 64, 3, padding='same', activation=tf.nn.relu)
-        pool2 = tf.layers.max_pooling2d(conv2_2, 2, 2)
-        dropout2 = tf.layers.dropout(pool2, 0.7, training=training)
+        flat = tf.contrib.layers.flatten(X)
 
-        conv3_1 = tf.layers.conv2d(dropout2, 128, 3, padding='same', activation=tf.nn.relu)
-        conv3_2 = tf.layers.conv2d(conv3_1, 128, 3, padding='same', activation=tf.nn.relu)
-        pool3 = tf.layers.max_pooling2d(conv3_2, 2, 2)
-        dropout3 = tf.layers.dropout(pool3, 0.7, training=training)
-
-        conv4_1 = tf.layers.conv2d(dropout3, 256, 3, padding='same', activation=tf.nn.relu)
-        conv4_2 = tf.layers.conv2d(conv4_1, 256, 3, padding='same', activation=tf.nn.relu)
-        conv4_3 = tf.layers.conv2d(conv4_2, 256, 3, padding='same', activation=tf.nn.relu)
-        pool4 = tf.layers.max_pooling2d(conv4_3, 2, 2)
-        flat4 = tf.contrib.layers.flatten(pool4)
-
-        d1 = tf.layers.dense(flat4, 512)
+        d1 = tf.layers.dense(flat, 512)
         d2 = tf.layers.dense(d1, 512)
         out = tf.layers.dense(d2, config.class_num)
         return tf.nn.softmax(out)
@@ -52,7 +45,7 @@ class CNN(object):
 
     def get_accuracy(self, logits, labels):
         correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
         # accuracy = tf.metrics.accuracy(
         #     labels=tf.argmax(labels, axis=1), predictions=tf.argmax(logits, axis=1))[1]
         return accuracy

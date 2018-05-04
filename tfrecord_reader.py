@@ -7,7 +7,7 @@ import time
 
 
 class tfrecord_read(object):
-    def __init__(self, dataset_name='dset1', training=True, train_slice=0.8):
+    def __init__(self, dataset_name='dset1', num_epochs=config.num_epochs, train_slice=0.8, training=True):
         # Data has been shuffled manually before.
         # Take first train_slice files for training, and take last 1-train_slice files for validation.
         tfrecord_dir = os.path.join('tfrecord', dataset_name)
@@ -19,7 +19,7 @@ class tfrecord_read(object):
             tfrecord_files = tfrecord_files[:slice_pos]
         else:
             tfrecord_files = tfrecord_files[slice_pos:]
-        filename_queue = tf.train.string_input_producer(tfrecord_files, num_epochs=None, shuffle=True)
+        filename_queue = tf.train.string_input_producer(tfrecord_files, num_epochs=num_epochs, shuffle=True)
 
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)

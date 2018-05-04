@@ -20,7 +20,7 @@ class tfrecord_read(object):
             tfrecord_files = tfrecord_files[:slice_pos]
         else:
             tfrecord_files = tfrecord_files[slice_pos:]
-        filename_queue = tf.train.string_input_producer(tfrecord_files, num_epochs=num_epochs, shuffle=True)
+        filename_queue = tf.train.string_input_producer(tfrecord_files, num_epochs=config.num_epochs, shuffle=True)
 
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
@@ -42,6 +42,7 @@ def test_reader():
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
+    sess.run(tf.local_variables_initializer())
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 

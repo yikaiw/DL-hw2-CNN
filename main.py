@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 from tfrecord_reader import tfrecord_read
 import config
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_string('dataset', 'dset1', 'choose dset1 or dset2')
@@ -35,55 +35,60 @@ def main():
     saver = tf.train.Saver()
 
     print('Build session.')
-    with tf.Session() as sess:
-        if FLAGS.pretrained is not None:
-            checkpoint = tf.train.get_checkpoint_state(checkpoint_path)
-            meta_graph_path = checkpoint.model_checkpoint_path + '.meta'
-            restore = tf.train.import_meta_graph(meta_graph_path)
-            restore.restore(sess, tf.train.latest_checkpoint(checkpoint_path))
-            step = int(meta_graph_path.split('-')[2].split('.')[0])
-        else:
-            sess.run(tf.global_variables_initializer())
-            step = 0
+    sess = tf.Session()
 
-        # train_writer = tf.summary.FileWriter('log', sess.graph)
-        # summary_op = tf.summary.merge_all()
+    if FLAGS.pretrained is not None:
+        print('Restore from pretrained model.')
+        checkpoint = tf.train.get_checkpoint_state(checkpoint_path)
+        meta_graph_path = checkpoint.model_checkpoint_path + '.meta'
+        restore = tf.train.import_meta_graph(meta_graph_path)
+        restore.restore(sess, tf.train.latest_checkpoint(checkpoint_path))
+        step = int(meta_graph_path.split('-')[2].split('.')[0])
+    else:
+        print('Initialize.')
+        sess.run(tf.global_variables_initializer())
+        sess.run(tf.local_variables_initializer())
+        step = 0
 
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-        try:
-            print('Start training:')
-            while not coord.should_stop():
-                X_train_batch, y_train_batch = sess.run([read_for_train.X_batch, read_for_train.y_batch])
-                loss, _ = sess.run([cnn.loss, cnn.optimizer],
-                    {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
+    # train_writer = tf.summary.FileWriter('log', sess.graph)
+    # summary_op = tf.summary.merge_all()
 
-                X_val_batch, y_val_batch = sess.run([read_for_val.X_batch, read_for_val.y_batch])
-                accuracy = sess.run(cnn.accuracy,
-                    {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    try:
+        print('Start training:')
+        while not coord.should_stop():
+            X_train_batch, y_train_batch = sess.run([read_for_train.X_batch, read_for_train.y_batch])
+            loss, _ = sess.run([cnn.loss, cnn.optimizer],
+                {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
 
-                # train_writer.add_summary(summary, step)
-                # train_writer.flush()
+            X_val_batch, y_val_batch = sess.run([read_for_val.X_batch, read_for_val.y_batch])
+            accuracy = sess.run(cnn.accuracy,
+                {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
 
-                if step % 100 == 0:
-                    print('At step {}:'.format(step))
-                    print('\tloss: {}'.format(loss))
-                    print('\taccuracy: {}'.format(accuracy))
-                if step % 10000 == 0 and step > 0:
-                    save_path = saver.save(sess, model_save_path, global_step=step)
-                    print('Model saved in file: %s' % save_path)
-                step += 1
+            # train_writer.add_summary(summary, step)
+            # train_writer.flush()
 
-        except KeyboardInterrupt:
-            print('Interrupted')
-            coord.request_stop()
-        except Exception as e:
-            coord.request_stop(e)
-        finally:
-            save_path = saver.save(sess, model_save_path, global_step=step)
-            print('Model saved in file: %s' % save_path)
-            coord.request_stop()
-            coord.join(threads)
+            if step % 100 == 0:
+                print('At step {}:'.format(step))
+                print('\tloss: {}'.format(loss))
+                print('\taccuracy: {}'.format(accuracy))
+            if step % 10000 == 0 and step > 0:
+                save_path = saver.save(sess, model_save_path, global_step=step)
+                print('Model saved in file: %s' % save_path)
+            step += 1
+
+    except KeyboardInterrupt:
+        print('Interrupted')
+        coord.request_stop()
+    except Exception as e:
+        coord.request_stop(e)
+    finally:
+        save_path = saver.save(sess, model_save_path, global_step=step)
+        print('Model saved in file: %s' % save_path)
+        coord.request_stop()
+        coord.join(threads)
+        sess.close()
 
 
 if __name__ == '__main__':

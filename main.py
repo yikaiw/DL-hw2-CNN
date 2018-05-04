@@ -22,10 +22,13 @@ def main():
             os.makedirs(checkpoint_path)
         except os.error:
             print('Unable to make checkpoints direction: %s' % checkpoint_path)
+    model_save_path = os.path.join(checkpoint_path, 'model.ckpt')
 
     cnn = CNN()
-    read_for_train = tfrecord_read(FLAGS.dataset, config.num_epochs, config.train_slice, training=True)
-    read_for_val = tfrecord_read(FLAGS.dataset, config.num_epochs, config.train_slice, training=False)
+    read_for_train = tfrecord_read(
+        FLAGS.dataset, config.batch_size, config.num_epochs, config.train_slice, training=True)
+    read_for_val = tfrecord_read(
+        FLAGS.dataset, config.batch_size, config.num_epochs, config.train_slice, training=False)
 
     # summary_op = tf.summary.merge_all()
     # train_writer = tf.summary.FileWriter(checkpoint_path, graph)
@@ -67,7 +70,7 @@ def main():
                     print('\tloss: {}'.format(loss))
                     print('\taccuracy: {}'.format(accuracy))
                 if step % 10000 == 0 and step > 0:
-                    save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
+                    save_path = saver.save(sess, model_save_path, global_step=step)
                     print('Model saved in file: %s' % save_path)
                 step += 1
 
@@ -77,7 +80,7 @@ def main():
         except Exception as e:
             coord.request_stop(e)
         finally:
-            save_path = saver.save(sess, checkpoint_path + '/model.ckpt', global_step=step)
+            save_path = saver.save(sess, model_save_path, global_step=step)
             print('Model saved in file: %s' % save_path)
             coord.request_stop()
             coord.join(threads)

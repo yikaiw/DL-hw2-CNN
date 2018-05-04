@@ -7,7 +7,8 @@ import time
 
 
 class tfrecord_read(object):
-    def __init__(self, dataset_name='dset1', num_epochs=config.num_epochs, train_slice=0.8, training=True):
+    def __init__(self, dataset_name='dset1', batch_size=config.batch_size,
+                 num_epochs=config.num_epochs, train_slice=0.8, training=True):
         # Data has been shuffled manually before.
         # Take first train_slice files for training, and take last 1-train_slice files for validation.
         tfrecord_dir = os.path.join('tfrecord', dataset_name)
@@ -33,7 +34,7 @@ class tfrecord_read(object):
         label = features['label']
 
         self.X_batch, self.y_batch = tf.train.shuffle_batch(
-            tensors=[img, label], batch_size=config.batch_size, capacity=5000, min_after_dequeue=100, num_threads=3)
+            tensors=[img, label], batch_size=batch_size, capacity=5000, min_after_dequeue=100, num_threads=3)
 
 
 def test_reader():

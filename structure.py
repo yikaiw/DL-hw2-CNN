@@ -22,16 +22,16 @@ class CNN(object):
         tf.summary.scalar('accuracy', self.accuracy)
 
     def layers(self, X_inputs, training):
-        X = X_inputs
+        input = X_inputs
         filters = [64, 128, 256, 512, 512]
         for filter in filters:
             for i in range(2):
-                X = tf.layers.conv2d(X, filter, 3, padding='same', activation=None)
-                X = tf.layers.batch_normalization(X, training=training)
-                X = tf.nn.relu(X)
-            X = tf.layers.max_pooling2d(X, 2, 2)
+                input = tf.layers.conv2d(input, filter, 3, padding='same', activation=None)
+                input = tf.layers.batch_normalization(input, training=training)
+                input = tf.nn.relu(input)
+            input = tf.layers.max_pooling2d(input, 2, 2)
 
-        flat = tf.contrib.layers.flatten(X)
+        flat = tf.contrib.layers.flatten(input)
 
         d1 = tf.layers.dense(flat, 512)
         d2 = tf.layers.dense(d1, 512)

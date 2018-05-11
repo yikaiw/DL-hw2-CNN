@@ -7,3 +7,4 @@ beta1 = 0.9  # paramater of Adam
 beta2 = 0.999  # paramater of Adam
 train_slice = 0.8  # the ratio of training data to total data, rest for validation
 num_epochs = 30
+file_num = {'dset1': 4032, 'dset2': 4040}

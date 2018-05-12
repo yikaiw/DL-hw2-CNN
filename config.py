@@ -1,6 +1,6 @@
 tfrecord_num = 32  # num of tfrecord files
 class_num = 64  # num of classes in the dataset
-batch_size = 64
+batch_size = 32
 img_size = 256
 learning_rate = 1e-2
 beta1 = 0.9  # paramater of Adam

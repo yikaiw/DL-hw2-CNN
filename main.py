@@ -8,9 +8,9 @@ import config
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 FLAGS = tf.flags.FLAGS
-tf.flags.DEFINE_string('dataset', default='dset1', help='Choose dset1 or dset2 for training, default dset1.')
-tf.flags.DEFINE_string('checkpoint', default=None,
-                       help='Whether use a pre-trained checkpoint to continue training, default None.')
+tf.flags.DEFINE_string('dataset', 'dset1', 'Choose dset1 or dset2 for training, default dset1.')
+tf.flags.DEFINE_string('checkpoint', None, 
+                       'Whether use a pre-trained checkpoint to continue training, default None.')
 
 
 def main():
@@ -75,15 +75,12 @@ def main():
 
             epoch_cur = step * config.batch_size // config.file_num[FLAGS.dataset]
             if epoch_cur > epoch_pre:
-                print('For epoch {}:'.format(epoch_pre))
-                print('\taccuracy: {}'.format(np.mean(accuracies)))
-                print('-----------------')
+                print('For epoch {}: accuracy = {}'.format(epoch_pre, np.mean(accuracies)))
                 epoch_pre = epoch_cur
                 accuracies = []
 
             if step % 100 == 0:
-                print('At step {}:'.format(step))
-                print('\tloss: {}'.format(loss))
+                print('At step {}: loss = {}'.format(step, loss))
             if step % 10000 == 0 and step > 0:
                 save_path = saver.save(sess, model_save_path, global_step=step)
                 print('Model saved in file: %s' % save_path)

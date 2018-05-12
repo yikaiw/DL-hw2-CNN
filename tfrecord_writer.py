@@ -3,7 +3,6 @@ import tensorflow as tf
 import os
 import sys
 import time
-from tqdm import tqdm
 import config
 
 dset_dirs = ['data/dset1/train', 'data/dset2/train']
@@ -64,7 +63,7 @@ def convert_tfrecord_dataset(img_paths, labels, tfrecord_dir, tfrecord_num, shuf
             start_ndx = shard_id * num_per_shard
             end_ndx = min((shard_id + 1) * num_per_shard, n_sample)
             for i in range(start_ndx, end_ndx):
-                sys.stdout.write('\r>> Converting image %d/%d shard %d, %g s' % (
+                sys.stdout.write('\r>> Converting image %d/%d shard %d, total time(second): %g' % (
                     i + 1, n_sample, shard_id, time.time() - time0))
                 sys.stdout.flush()
                 png_path = img_paths[i]
@@ -81,6 +80,6 @@ if __name__ == '__main__':
         print('\nWriting dset{} to tfrecord files:'.format(i + 1))
         img_paths, labels = get_file_path(data_path=dset_dirs[i])
         print('File num in dset{}:'.format(i + 1), len(img_paths))
-        print('You need to modify file_num in config.py if you do not use dset1 or dset2 as a dataset.')
         convert_tfrecord_dataset(img_paths, labels, tfrecord_dirs[i], tfrecord_num, shuffle=True)
-    print('\nFinished writing data to tfrecord files.')
+    print('\nYou need to modify file_num in config.py if you do not use dset1 or dset2 as a dataset.')
+    print('Finished writing data to tfrecord files.')

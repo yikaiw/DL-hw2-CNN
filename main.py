@@ -1,11 +1,11 @@
 import numpy as np
 import tensorflow as tf
-from structure import CNN
+from structure_vgg import CNN
 from datetime import datetime
 import os
 from tfrecord_reader import tfrecord_read
 import config
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_string('dataset', 'dset1', 'Choose dset1 or dset2 for training, default dset1.')
@@ -33,9 +33,10 @@ def main():
         FLAGS.dataset, config.batch_size, config.num_epochs, config.train_slice, training=False)
 
     saver = tf.train.Saver()
-
     print('Build session.')
-    sess = tf.Session()
+    tfconfig = tf.ConfigProto()
+    tfconfig.gpu_options.allow_growth = True
+    sess = tf.Session(config=tfconfig)
 
     if FLAGS.checkpoint is not None:
         print('Restore from pre-trained model.')
@@ -51,7 +52,9 @@ def main():
         step = 0
 
     epoch_pre = step * config.batch_size // config.file_num[FLAGS.dataset]
-    accuracies = []
+    correct_pre_nums = []
+    accuracy_list = []
+    loss_list = []
 
     # train_writer = tf.summary.FileWriter('log', sess.graph)
     # summary_op = tf.summary.merge_all()
@@ -64,24 +67,26 @@ def main():
             X_train_batch, y_train_batch = sess.run([read_for_train.X_batch, read_for_train.y_batch])
             loss, _ = sess.run([cnn.loss, cnn.optimizer],
                 {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
-
+            loss_list.append(loss)
+            
             X_val_batch, y_val_batch = sess.run([read_for_val.X_batch, read_for_val.y_batch])
-            accuracy = sess.run(cnn.accuracy,
+            correct_pre_num = sess.run(cnn.correct_pre_num,
                 {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
-            accuracies.append(accuracy)
+            correct_pre_nums.append(correct_pre_num)
 
             # train_writer.add_summary(summary, step)
             # train_writer.flush()
 
             epoch_cur = step * config.batch_size // config.file_num[FLAGS.dataset]
             if epoch_cur > epoch_pre:
-                print('For epoch {}: accuracy = {}'.format(epoch_pre, np.mean(accuracies)))
+                accuracy = np.sum(correct_pre_nums) / config.file_num[FLAGS.dataset]
+                accuracy_list.append(accuracy)
+                print('For epoch {}: accuracy = {}'.format(epoch_pre, accuracy))
                 epoch_pre = epoch_cur
-                accuracies = []
+                correct_pre_nums = []
 
-            if step % 100 == 0:
-                print('At step {}: loss = {}'.format(step, loss))
-            if step % 10000 == 0 and step > 0:
+            print('>> At step {}: loss = {}'.format(step, loss))
+            if step % 1000 == 0 and step > 0:
                 save_path = saver.save(sess, model_save_path, global_step=step)
                 print('Model saved in file: %s' % save_path)
             step += 1

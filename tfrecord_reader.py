@@ -35,7 +35,7 @@ class tfrecord_read(object):
 
         img = features['image']
         img = tf.image.decode_png(img, channels=3)  # get tf.Tensor([height, width, channel], dtype=float32)
-        img = tf.image.resize_images(img, size=[config.img_size, config.img_size])
+        img = tf.image.resize_images(img, size=[config.img_size, config.img_size]) / 255
         label = features['label']
 
         self.X_batch, self.y_batch = tf.train.shuffle_batch(
@@ -52,7 +52,7 @@ def test_reader():
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
     
     X_train_batch, y_train_batch = sess.run([reader.X_batch, reader.y_batch])
-    print(X_train_batch.shape, y_train_batch.shape)
+    print(X_train_batch.shape, y_train_batch.shape)  # (8, 256, 256, 3) (8,)
     step = 0
     
     try:

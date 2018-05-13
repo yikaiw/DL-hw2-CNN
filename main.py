@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from structure_vgg import CNN
+from structure_cnn import CNN
 from datetime import datetime
 import os
 from tfrecord_reader import tfrecord_read
@@ -81,11 +81,12 @@ def main():
             if epoch_cur > epoch_pre:
                 accuracy = np.sum(correct_pre_nums) / config.file_num[FLAGS.dataset]
                 accuracy_list.append(accuracy)
-                print('For epoch {}: accuracy = {}'.format(epoch_pre, accuracy))
+                print('For epoch {}: accuracy = {}\n'.format(epoch_pre, accuracy))
                 epoch_pre = epoch_cur
                 correct_pre_nums = []
-
-            print('>> At step {}: loss = {}'.format(step, loss))
+            
+            if step % 10 == 0:
+                print('>> At step {}: loss = {}'.format(step, loss))
             if step % 1000 == 0 and step > 0:
                 save_path = saver.save(sess, model_save_path, global_step=step)
                 print('Model saved in file: %s' % save_path)

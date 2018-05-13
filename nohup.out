@@ -1,0 +1,50 @@
+[W 20:57:43.717 NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
+[I 20:57:43.728 NotebookApp] Serving notebooks from local directory: /home1/wyk/work/DL-hw2-CNN
+[I 20:57:43.728 NotebookApp] 0 active kernels 
+[I 20:57:43.728 NotebookApp] The Jupyter Notebook is running at: http://[all ip addresses on your system]:8889/
+[I 20:57:43.728 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[I 20:57:59.203 NotebookApp] 302 GET / (166.111.138.88) 0.79ms
+[I 20:57:59.289 NotebookApp] 302 GET /tree? (166.111.138.88) 1.54ms
+[I 20:58:02.445 NotebookApp] 302 POST /login?next=%2Ftree%3F (166.111.138.88) 2.51ms
+[I 20:58:21.593 NotebookApp] Saving file at /tfrecord_reader.py
+[I 21:03:22.922 NotebookApp] Saving file at /config.py
+[I 21:07:39.201 NotebookApp] Saving file at /structure_res.py
+[I 21:07:56.645 NotebookApp] Saving file at /structure_res.py
+[I 21:09:28.242 NotebookApp] Saving file at /main.py
+[I 21:09:29.271 NotebookApp] Saving file at /main.py
+[I 21:09:43.032 NotebookApp] Saving file at /main.py
+[I 21:11:02.314 NotebookApp] Saving file at /config.py
+[I 21:13:50.530 NotebookApp] Saving file at /structure_res.py
+[I 21:22:20.781 NotebookApp] Saving file at /cnn.py
+[I 21:29:46.720 NotebookApp] Saving file at /cnn.py
+[I 21:29:49.840 NotebookApp] Saving file at /cnn.py
+[I 21:31:17.910 NotebookApp] Saving file at /cnn.py
+[I 21:31:59.245 NotebookApp] Saving file at /cnn.py
+[I 21:32:04.121 NotebookApp] Saving file at /cnn.py
+[I 21:38:15.549 NotebookApp] Saving file at /cnn.py
+[I 21:50:32.441 NotebookApp] Saving file at /main.py
+[I 21:51:13.749 NotebookApp] Saving file at /structure_cnn.py
+[I 21:52:52.708 NotebookApp] Saving file at /structure_cnn.py
+[I 21:52:57.008 NotebookApp] Saving file at /structure_cnn.py
+[I 21:53:04.124 NotebookApp] Saving file at /structure_cnn.py
+[I 21:53:22.715 NotebookApp] Saving file at /resnet18.py
+[I 21:53:26.867 NotebookApp] Saving file at /resnet18.py
+[I 21:53:40.568 NotebookApp] Saving file at /resnet18.py
+[I 21:55:36.062 NotebookApp] Saving file at /resnet18.py
+[I 21:55:46.921 NotebookApp] Saving file at /resnet18.py
+[I 21:55:54.568 NotebookApp] Saving file at /resnet18.py
+[I 21:56:00.439 NotebookApp] Saving file at /resnet18.py
+[I 21:56:17.195 NotebookApp] Saving file at /resnet18.py
+[I 21:56:40.605 NotebookApp] Saving file at /resnet18.py
+[I 21:58:12.068 NotebookApp] Saving file at /structure_cnn.py
+[I 21:58:14.310 NotebookApp] Saving file at /structure_cnn.py
+[I 21:59:19.725 NotebookApp] Saving file at /structure_cnn.py
+[I 21:59:28.559 NotebookApp] Saving file at /structure_cnn.py
+[I 21:59:48.118 NotebookApp] Saving file at /structure_cnn.py
+[I 22:02:30.322 NotebookApp] Saving file at /structure_cnn.py
+[I 22:03:42.808 NotebookApp] Saving file at /structure_cnn.py
+[I 22:04:14.372 NotebookApp] Saving file at /structure_cnn.py
+[I 22:04:52.313 NotebookApp] Saving file at /structure_cnn.py
+[I 22:07:12.442 NotebookApp] Saving file at /structure_cnn.py
+[I 22:11:50.460 NotebookApp] Saving file at /structure_cnn.py
+[I 22:12:22.517 NotebookApp] Saving file at /structure_cnn.py

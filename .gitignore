@@ -16,6 +16,7 @@ tfrecord/
 __pycache__/
 
 try.py
+*.pyc
 
 # gradle
 .gradle/

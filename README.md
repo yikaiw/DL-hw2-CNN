@@ -12,7 +12,7 @@ First, download two datasets:
 * [Dataset download link](https://pan.baidu.com/s/10cT-PIYP2QExZGYEfS6ovw).
 * Directory structure: './dset{1, 2}/train/label{0, 1, ..., 64}/xxx.jpg'.
 
-Second, build new folder 'data' and put the folders 'dset1' and 'dset2' into 'data'.
+Second, build new folder data/ and put the folders dset1 and dset2 into data/.
 
 Third, write dset1 and dset2 to tfrecords:
 

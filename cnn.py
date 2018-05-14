@@ -3,7 +3,6 @@ import cv2
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,3'
 
 
 # configs
@@ -24,7 +23,7 @@ tf.app.flags.DEFINE_float("learning_rate", 0.01, "The learning rate")
 '''TODO: you may add more configs such as base learning rate, max_iteration,
 display_iteration, valid_iteration and etc. '''
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 class DataSet(object):
     '''

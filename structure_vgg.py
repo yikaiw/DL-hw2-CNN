@@ -3,17 +3,16 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import config
 
-tf.set_random_seed(1)
-np.random.seed(1)
-
 
 class CNN(object):
     def __init__(self):
         self.X_inputs = tf.placeholder(tf.float32, [None, config.img_size, config.img_size, 3])
-        self.y_inputs = tf.placeholder(tf.int32, [None, ])
+        self.y_inputs = tf.placeholder(tf.int32, [None])
         self.labels = tf.one_hot(self.y_inputs, config.class_num, axis=1)
         self.training = tf.placeholder(tf.bool)
         self.keep_prob = tf.placeholder(tf.float32)
+        self.global_step = tf.Variable(initial_value=0, trainable=False)
+        self.learning_rate = tf.train.exponential_decay(config.learning_rate, self.global_step, 2e3, 1e-4)
 
         self.logits = self.layers(self.X_inputs)
         self.loss, self.optimizer = self.optimize(self.logits, self.labels)
@@ -38,7 +37,8 @@ class CNN(object):
 
     def optimize(self, logits, labels):
         loss = tf.losses.softmax_cross_entropy(onehot_labels=labels, logits=logits)
-        optimizer = tf.train.AdamOptimizer(config.learning_rate).minimize(loss)
+        optimizer = tf.train.AdamOptimizer(
+            self.learning_rate, config.beta1, config.beta2).minimize(loss, global_step=self.global_step)
         return loss, optimizer
 
     def get_correct_pre_num(self, logits, labels):

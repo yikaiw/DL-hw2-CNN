@@ -3,6 +3,8 @@ import cv2
 from PIL import Image
 import numpy as np
 import tensorflow as tf
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,3'
+
 
 # configs
 FLAGS = tf.app.flags.FLAGS

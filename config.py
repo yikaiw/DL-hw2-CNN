@@ -1,11 +1,12 @@
 tfrecord_num = 32  # num of tfrecord files
 class_num = 64  # num of classes in the dataset
 batch_size = 32
-img_size = 256
-learning_rate = 1e-1
+img_size = 224
+learning_rate = 0.01
 beta1 = 0.9  # paramater of Adam
 beta2 = 0.999  # paramater of Adam
 train_slice = 0.8  # the ratio of training data to total data, rest for validation
 num_epochs = 30
 file_num = {'dset1': 4032, 'dset2': 4040}
 weight_decay = 0.00005
+keep_prob = 0.8

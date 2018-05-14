@@ -35,7 +35,7 @@ class tfrecord_read(object):
 
         img = features['image']
         img = tf.image.decode_png(img, channels=3)  # get tf.Tensor([height, width, channel], dtype=float32)
-        img = tf.image.resize_images(img, size=[config.img_size, config.img_size]) / 255
+        img = tf.image.resize_images(img, size=[config.img_size, config.img_size]) / 255.0
         label = features['label']
 
         self.X_batch, self.y_batch = tf.train.shuffle_batch(

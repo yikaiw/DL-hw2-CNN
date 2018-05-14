@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from tfrecord_reader import tfrecord_read
 import config
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 FLAGS = tf.flags.FLAGS
 tf.flags.DEFINE_string('dataset', 'dset1', 'Choose dset1 or dset2 for training, default dset1.')
@@ -53,7 +53,7 @@ def main():
 
     epoch_pre = step * config.batch_size // config.file_num[FLAGS.dataset]
     correct_pre_nums = []
-    accuracy_list = []
+    val_epoch_accuracy_list = []
     loss_list = []
 
     # train_writer = tf.summary.FileWriter('log', sess.graph)
@@ -65,13 +65,15 @@ def main():
         print('Start training:')
         while not coord.should_stop():
             X_train_batch, y_train_batch = sess.run([read_for_train.X_batch, read_for_train.y_batch])
-            loss, _ = sess.run([cnn.loss, cnn.optimizer],
-                {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, cnn.training: True})
+            loss, train_batch_accuracy, _ = sess.run([cnn.loss, cnn.batch_accuracy, cnn.optimizer],
+                {cnn.X_inputs: X_train_batch, cnn.y_inputs: y_train_batch, 
+                 cnn.keep_prob: config.keep_prob, cnn.training: True})
             loss_list.append(loss)
             
             X_val_batch, y_val_batch = sess.run([read_for_val.X_batch, read_for_val.y_batch])
-            correct_pre_num = sess.run(cnn.correct_pre_num,
-                {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, cnn.training: False})
+            correct_pre_num, val_batch_accuracy = sess.run([cnn.correct_pre_num, cnn.batch_accuracy],
+                {cnn.X_inputs: X_val_batch, cnn.y_inputs: y_val_batch, 
+                 cnn.keep_prob: 1.0, cnn.training: False})
             correct_pre_nums.append(correct_pre_num)
 
             # train_writer.add_summary(summary, step)
@@ -79,14 +81,16 @@ def main():
 
             epoch_cur = step * config.batch_size // config.file_num[FLAGS.dataset]
             if epoch_cur > epoch_pre:
-                accuracy = np.sum(correct_pre_nums) / config.file_num[FLAGS.dataset]
-                accuracy_list.append(accuracy)
-                print('For epoch {}: accuracy = {}\n'.format(epoch_pre, accuracy))
+                val_epoch_accuracy = np.sum(correct_pre_nums) / ((step + 1) * config.batch_size)
+                val_epoch_accuracy_list.append(val_epoch_accuracy)
+                print('For epoch %i: val_epoch_accuracy = %.3f%%\n' % 
+                      (epoch_pre, val_epoch_accuracy * 100))
                 epoch_pre = epoch_cur
                 correct_pre_nums = []
             
             if step % 10 == 0:
-                print('>> At step {}: loss = {}'.format(step, loss))
+                print('>> At step %i: loss = %.3f, train_batch_accuracy = %.3f%%' % 
+                      (step, loss, train_batch_accuracy * 100))
             if step % 1000 == 0 and step > 0:
                 save_path = saver.save(sess, model_save_path, global_step=step)
                 print('Model saved in file: %s' % save_path)
